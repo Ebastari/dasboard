@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Montana AI – Smart Land Reclamation (AI Guide Interaktif)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4CAF50;
+      --dark: #388E3C;
+      --light: #E8F5E9;
+      --bg: #f5f5f5;
+      --text: #1B1B1B;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 25px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 900px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .header h1 {
+      color: var(--dark);
+      font-size: 1.6em;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      color: #555;
+      font-size: 0.95em;
+    }
+
+    .body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 30px;
+      gap: 20px;
+    }
+
+    .robot {
+      width: 140px;
+      height: 140px;
+      flex-shrink: 0;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .chat {
+      background: var(--light);
+      border-radius: 15px;
+      padding: 20px;
+      flex: 1;
+      min-height: 160px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      position: relative;
+      font-size: 1em;
+      line-height: 1.6;
+    }
+
+    .chat::after {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 25px;
+      border-width: 10px;
+      border-style: solid;
+      border-color: transparent var(--light) transparent transparent;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+      border-top: 1px solid #eee;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover { background: var(--dark); transform: scale(1.05); }
+
+    .progress {
+      font-size: 0.9em;
+      color: #777;
+    }
+
+    .typing {
+      border-right: 2px solid rgba(0,0,0,0.4);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Montana AI – Smart Land Reclamation</h1>
+      <p>Panduan interaktif oleh asisten AI Montana</p>
+    </div>
+
+    <div class="body">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="Robot AI" class="robot">
+      <div class="chat" id="chat"></div>
+    </div>
+
+    <div class="controls">
+      <div class="progress" id="progress">Langkah 0 dari 5</div>
+      <div>
+        <button class="btn" id="skip">Lewati</button>
+        <button class="btn" id="next" disabled>Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const nextBtn = document.getElementById('next');
+    const skipBtn = document.getElementById('skip');
+    const progress = document.getElementById('progress');
+
+    const steps = [
+      "Halo, saya Montana — asisten AI kamu. Yuk, saya tunjukkan cara kerja aplikasinya!",
+      "Montana AI adalah platform digital cerdas untuk mendukung pengelolaan nursery, pemantauan tanaman, dan reklamasi lahan berbasis data real-time.",
+      "Fitur utama meliputi manajemen bibit terpadu, pemantauan kondisi tanaman dengan sensor, dan analisis kesehatan daun berbasis AI.",
+      "Montana AI juga menyediakan pelaporan digital, chatbot cerdas, serta integrasi data spasial dan cuaca.",
+      "Dengan Montana AI, efisiensi, akurasi, dan transparansi kegiatan reklamasi lahan semakin meningkat!"
+    ];
+
+    let index = 0;
+    let typing = false;
+
+    function typeText(text) {
+      chat.innerHTML = '';
+      const span = document.createElement('span');
+      span.className = 'typing';
+      chat.appendChild(span);
+      let i = 0;
+      typing = true;
+
+      const interval = setInterval(() => {
+        span.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          span.classList.remove('typing');
+          typing = false;
+          nextBtn.disabled = false;
+          speakText(text);
+        }
+      }, 25);
+    }
+
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'id-ID';
+        utter.rate = 1;
+        utter.pitch = 1;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function nextStep() {
+      if (typing) return;
+      if (index < steps.length) {
+        typeText(steps[index]);
+        progress.textContent = `Langkah ${index + 1} dari ${steps.length}`;
+        index++;
+        nextBtn.disabled = true;
+      } else {
+        chat.innerHTML = 'Terima kasih! Sekarang kamu siap menggunakan aplikasi Montana AI. 🚀';
+        speakText('Terima kasih! Sekarang kamu siap menggunakan aplikasi Montana AI.');
+        nextBtn.style.display = 'none';
+      }
+    }
+
+    nextBtn.addEventListener('click', nextStep);
+
+    skipBtn.addEventListener('click', () => {
+  window.speechSynthesis.cancel();
+  chat.innerHTML = 'Petunjuk dilewati. Mengalihkan ke aplikasi utama... 👋';
+  progress.textContent = 'Mengalihkan...';
+  
+  // Ganti "home.html" dengan halaman tujuan kamu
+  setTimeout(() => {
+    window.location.href = "testdas45";
+  }, 1500);
+});
+
+
+    // Auto mulai setelah 1 detik
+    setTimeout(() => nextStep(), 800);
+  </script>
+</body>
+</html>
